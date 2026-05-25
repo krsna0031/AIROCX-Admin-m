@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+
 function CharactersTab() {
   const [characters, setCharacters] = useState([]);
   const [editing, setEditing] = useState(null);
@@ -11,7 +13,7 @@ function CharactersTab() {
 
   const fetchCharacters = async () => {
     try {
-      const response = await fetch('/api/characters');
+      const response = await fetch(`${BACKEND_URL}/api/characters`);
       if (response.ok) {
         const data = await response.json();
         setCharacters(data);
@@ -33,7 +35,7 @@ function CharactersTab() {
   const handleSave = async () => {
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`/api/characters/${editing}`, {
+      const response = await fetch(`${BACKEND_URL}/api/characters/${editing}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +62,7 @@ function CharactersTab() {
     
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`/api/characters/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/characters/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -89,7 +91,7 @@ function CharactersTab() {
 
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch('/api/characters', {
+      const response = await fetch(`${BACKEND_URL}/api/characters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

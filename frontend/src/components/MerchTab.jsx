@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+
 function MerchTab() {
   const [merch, setMerch] = useState([]);
   const [editing, setEditing] = useState(null);
@@ -11,7 +13,7 @@ function MerchTab() {
 
   const fetchMerch = async () => {
     try {
-      const response = await fetch('/api/merch');
+      const response = await fetch(`${BACKEND_URL}/api/merch`);
       if (response.ok) {
         setMerch(await response.json());
       }
@@ -33,7 +35,7 @@ function MerchTab() {
   const handleSave = async () => {
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`/api/merch/${editing}`, {
+      const response = await fetch(`${BACKEND_URL}/api/merch/${editing}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +61,7 @@ function MerchTab() {
     if (!window.confirm('Delete this product from catalog?')) return;
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`/api/merch/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/merch/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -84,7 +86,7 @@ function MerchTab() {
 
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch('/api/merch', {
+      const response = await fetch(`${BACKEND_URL}/api/merch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

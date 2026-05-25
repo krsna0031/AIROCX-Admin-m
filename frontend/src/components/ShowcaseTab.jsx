@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+
 function ShowcaseTab() {
   const [showcase, setShowcase] = useState([]);
   const [editing, setEditing] = useState(null);
@@ -11,7 +13,7 @@ function ShowcaseTab() {
 
   const fetchShowcase = async () => {
     try {
-      const response = await fetch('/api/showcase');
+      const response = await fetch(`${BACKEND_URL}/api/showcase`);
       if (response.ok) {
         setShowcase(await response.json());
       }
@@ -33,7 +35,7 @@ function ShowcaseTab() {
   const handleSave = async () => {
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`/api/showcase/${editing}`, {
+      const response = await fetch(`${BACKEND_URL}/api/showcase/${editing}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +61,7 @@ function ShowcaseTab() {
     if (!window.confirm('Delete this showcase asset?')) return;
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`/api/showcase/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/showcase/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -86,7 +88,7 @@ function ShowcaseTab() {
 
     const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch('/api/showcase', {
+      const response = await fetch(`${BACKEND_URL}/api/showcase`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+
 function MainWebsite() {
   const [characters, setCharacters] = useState([]);
   const [showcaseItems, setShowcaseItems] = useState([]);
@@ -19,9 +21,9 @@ function MainWebsite() {
   const fetchData = async () => {
     try {
       const [charsRes, showcaseRes, merchRes] = await Promise.all([
-        fetch('/api/characters'),
-        fetch('/api/showcase'),
-        fetch('/api/merch')
+        fetch(`${BACKEND_URL}/api/characters`),
+        fetch(`${BACKEND_URL}/api/showcase`),
+        fetch(`${BACKEND_URL}/api/merch`)
       ]);
       if (charsRes.ok && showcaseRes.ok && merchRes.ok) {
         setCharacters(await charsRes.json());
