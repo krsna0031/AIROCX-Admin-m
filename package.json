@@ -1,0 +1,15 @@
+{
+  "name": "airocx-workspace",
+  "version": "1.0.0",
+  "description": "Root workspace orchestrator for AIROCX Animation Studio",
+  "private": true,
+  "scripts": {
+    "setup": "npm install --prefix frontend && python3.12 -m venv backend/venv && ./backend/venv/bin/pip install -r backend/requirements.txt",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "cd backend && ./venv/bin/uvicorn app.main:app --reload --port 8001",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

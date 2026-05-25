@@ -1,0 +1,126 @@
+/* AIROCX DESIGN SYSTEM & STYLE TOKENS */
+
+:root {
+  /* Color Palette - Premium Neon Cyber Themes */
+  --bg-color: #070708;
+  --bg-card: rgba(22, 22, 28, 0.7);
+  --bg-card-hover: rgba(30, 30, 38, 0.95);
+  
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dark: #0f172a;
+
+  /* HSL Tailored Brand Colors */
+  --accent-hsl: 78, 100%, 66%;      /* Electric Lime */
+  --purple-hsl: 270, 85%, 64%;     /* Cosmic Violet */
+  --pink-hsl: 330, 90%, 60%;       /* Neon Rose */
+  --cyan-hsl: 185, 100%, 48%;      /* Cyber Cyan */
+  --orange-hsl: 24, 100%, 55%;     /* Fire Orange */
+
+  --accent: hsl(var(--accent-hsl));
+  --purple: hsl(var(--purple-hsl));
+  --pink: hsl(var(--pink-hsl));
+  --cyan: hsl(var(--cyan-hsl));
+  --orange: hsl(var(--orange-hsl));
+
+  /* Glassmorphism Styles */
+  --glass-bg: rgba(20, 20, 25, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-border-glow: rgba(201, 255, 83, 0.15);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --backdrop-blur: blur(12px);
+
+  /* Fonts */
+  --font-heading: 'Syne', 'Playfair Display', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Styles & Utility Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Common Animation Keyframes (GPU Accelerated) */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(var(--accent-hsl), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(var(--accent-hsl), 0.5);
+  }
+}
+
+@keyframes morph-blob {
+  0%, 100% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+  33% {
+    border-radius: 70% 30% 52% 48% / 60% 40% 60% 40%;
+  }
+  66% {
+    border-radius: 28% 72% 35% 65% / 35% 65% 35% 65%;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animations helpers */
+.animate-float {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+.animate-morph {
+  animation: morph-blob 12s ease-in-out infinite;
+}

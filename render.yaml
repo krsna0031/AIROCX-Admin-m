@@ -1,16 +1,21 @@
 services:
+  # 1. Python FastAPI Backend Service
   - type: web
-    name: airocx-backend
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    name: airocx-api
+    env: python
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
-      - key: MONGO_URL
-        sync: false
       - key: JWT_SECRET
-        sync: false
+        value: airocx-super-secret-key-2025
       - key: ADMIN_PASSWORD
-        sync: false
-      - key: FRONTEND_URL
-        sync: false
-    healthCheckPath: /api/health
+        value: AIROCXIP06
+
+  # 2. Vite React Frontend Static Service
+  - type: static
+    name: airocx-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    publishPath: "dist"
