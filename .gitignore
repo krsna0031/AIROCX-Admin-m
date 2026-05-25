@@ -57,3 +57,13 @@ airocx-temp/
 # Environment files
 *.env
 *.env.*
+
+# Python virtual environments
+venv/
+.venv/
+backend/venv/
+
+# SQLite database files
+*.db
+*.db-journal
+airocx.db
