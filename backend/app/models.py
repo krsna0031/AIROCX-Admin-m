@@ -41,3 +41,14 @@ class MerchItem(Base):
     color = Column(String(100), nullable=False)
     emoji = Column(String(50), nullable=False)
     image = Column(String(500), default="", nullable=True)
+
+
+class ContactMessage(Base):
+    __tablename__ = "contact_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(200), nullable=False)
+    subject = Column(String(100), nullable=False)
+    message = Column(Text, nullable=False)
+    created_at = Column(String(100), nullable=False)

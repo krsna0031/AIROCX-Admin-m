@@ -74,3 +74,21 @@ class MerchItemResponse(MerchItemBase):
     class Config:
         populate_by_name = True
         from_attributes = True
+
+# Contact Message Schemas
+class ContactMessageCreate(BaseModel):
+    name: str
+    email: str
+    subject: str
+    message: str
+
+class ContactMessageResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    subject: str
+    message: str
+    created_at: str
+
+    class Config:
+        from_attributes = True

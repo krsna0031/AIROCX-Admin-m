@@ -1,21 +1,23 @@
 services:
-  # 1. Python FastAPI Backend Service
+  # ═══════════════════════════════════════════════
+  # 1. Python FastAPI Backend (Render Web Service)
+  # ═══════════════════════════════════════════════
   - type: web
     name: airocx-api
-    env: python
+    runtime: python
     rootDir: backend
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    plan: free
     envVars:
+      - key: DATABASE_URL
+        value: "sqlite:///./airocx.db"
       - key: JWT_SECRET
-        value: airocx-super-secret-key-2025
+        generateValue: true
       - key: ADMIN_PASSWORD
-        value: AIROCXIP06
-
-  # 2. Vite React Frontend Static Service
-  - type: static
-    name: airocx-frontend
-    env: static
-    rootDir: frontend
-    buildCommand: "npm install && npm run build"
-    publishPath: "dist"
+        value: "AIROCXIP06"
+      - key: FRONTEND_URL
+        value: "https://your-app.vercel.app"
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+    healthCheckPath: /api/health

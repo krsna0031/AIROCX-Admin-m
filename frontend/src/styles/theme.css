@@ -1,11 +1,11 @@
-/* AIROCX DESIGN SYSTEM & STYLE TOKENS */
+/* AIROCX DESIGN SYSTEM & STYLE TOKENS — ULTRA FUNKY EDITION */
 
 :root {
   /* Color Palette - Premium Neon Cyber Themes */
   --bg-color: #070708;
   --bg-card: rgba(22, 22, 28, 0.7);
   --bg-card-hover: rgba(30, 30, 38, 0.95);
-  
+
   --text-primary: #f8fafc;
   --text-muted: #94a3b8;
   --text-dark: #0f172a;
@@ -23,21 +23,32 @@
   --cyan: hsl(var(--cyan-hsl));
   --orange: hsl(var(--orange-hsl));
 
-  /* Glassmorphism Styles */
+  /* Glassmorphism Styles — Upgraded */
   --glass-bg: rgba(20, 20, 25, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.07);
-  --glass-border-glow: rgba(201, 255, 83, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-glow: rgba(201, 255, 83, 0.2);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   --backdrop-blur: blur(12px);
+
+  /* Funky Border & Shadow Extras */
+  --funky-border: 1.5px solid rgba(255, 255, 255, 0.12);
+  --funky-glow-purple: 0 0 30px rgba(168, 85, 247, 0.25), 0 0 60px rgba(168, 85, 247, 0.08);
+  --funky-glow-pink: 0 0 30px rgba(232, 67, 147, 0.25), 0 0 60px rgba(232, 67, 147, 0.08);
+  --funky-glow-accent: 0 0 30px rgba(201, 255, 83, 0.25), 0 0 60px rgba(201, 255, 83, 0.08);
+  --funky-glow-cyan: 0 0 30px rgba(0, 210, 211, 0.25), 0 0 60px rgba(0, 210, 211, 0.08);
+  --neon-text-shadow: 0 0 10px currentColor, 0 0 30px currentColor, 0 0 60px currentColor;
+  --card-hover-lift: translateY(-10px) scale(1.04) rotate(0.5deg);
 
   /* Fonts */
   --font-heading: 'Syne', 'Playfair Display', sans-serif;
   --font-body: 'Space Grotesk', sans-serif;
 
-  /* Transitions */
+  /* Transitions — Bouncy by Default */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-elastic: 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
 /* Base Styles & Utility Resets */
@@ -58,6 +69,13 @@ body {
   overflow-x: hidden;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  /* Moving gradient background overlay */
+  background-image:
+    radial-gradient(ellipse at 15% 10%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 30%, rgba(232, 67, 147, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(0, 210, 211, 0.04) 0%, transparent 50%);
+  background-size: 200% 200%;
+  animation: gradient-shift 20s ease infinite;
 }
 
 a {
@@ -65,13 +83,52 @@ a {
   text-decoration: none;
 }
 
-/* Common Animation Keyframes (GPU Accelerated) */
+/* ═══════════════════════════════════════════════════
+   CUSTOM SCROLLBAR — Sleek Neon
+   ═══════════════════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(7, 7, 8, 0.9);
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--purple), var(--pink));
+  border-radius: 100px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent), var(--cyan));
+  border-radius: 100px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--purple-hsl)) rgba(7, 7, 8, 0.9);
+}
+
+/* ═══════════════════════════════════════════════════
+   ANIMATION KEYFRAMES — Full Funky Suite (GPU Accel)
+   ═══════════════════════════════════════════════════ */
+
+/* Original Animations — Enhanced */
 @keyframes float-slow {
   0%, 100% {
-    transform: translateY(0px) scale(1);
+    transform: translateY(0px) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-12px) scale(1.02) rotate(1deg);
   }
   50% {
-    transform: translateY(-20px) scale(1.05);
+    transform: translateY(-20px) scale(1.05) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-8px) scale(1.03) rotate(-1deg);
   }
 }
 
@@ -85,7 +142,7 @@ a {
     box-shadow: 0 0 20px rgba(var(--accent-hsl), 0.2);
   }
   50% {
-    box-shadow: 0 0 40px rgba(var(--accent-hsl), 0.5);
+    box-shadow: 0 0 50px rgba(var(--accent-hsl), 0.5), 0 0 80px rgba(var(--accent-hsl), 0.15);
   }
 }
 
@@ -104,15 +161,159 @@ a {
 @keyframes reveal-up {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(40px) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-/* Animations helpers */
+/* NEW — Shimmer sweep across elements */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* NEW — Playful wiggle */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(3deg); }
+  30% { transform: rotate(-3deg); }
+  45% { transform: rotate(2deg); }
+  60% { transform: rotate(-2deg); }
+  75% { transform: rotate(1deg); }
+  90% { transform: rotate(-1deg); }
+}
+
+/* NEW — Bounce-in entrance */
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(40px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08) translateY(-10px);
+  }
+  70% {
+    transform: scale(0.96) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* NEW — Glow pulse for buttons & badges */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(var(--accent-hsl), 0.2), 0 0 16px rgba(var(--accent-hsl), 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--accent-hsl), 0.5), 0 0 50px rgba(var(--accent-hsl), 0.2), 0 0 80px rgba(var(--accent-hsl), 0.08);
+  }
+}
+
+/* NEW — Gradient background shift (body) */
+@keyframes gradient-shift {
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 50% 100%; }
+  75% { background-position: 0% 50%; }
+  100% { background-position: 0% 0%; }
+}
+
+/* NEW — Border color dance */
+@keyframes border-dance {
+  0%, 100% {
+    border-color: rgba(168, 85, 247, 0.3);
+  }
+  25% {
+    border-color: rgba(232, 67, 147, 0.3);
+  }
+  50% {
+    border-color: rgba(201, 255, 83, 0.3);
+  }
+  75% {
+    border-color: rgba(0, 210, 211, 0.3);
+  }
+}
+
+/* NEW — Tilt hover micro-rotation */
+@keyframes tilt-hover {
+  0%, 100% {
+    transform: perspective(600px) rotateX(0deg) rotateY(0deg);
+  }
+  25% {
+    transform: perspective(600px) rotateX(2deg) rotateY(-2deg);
+  }
+  50% {
+    transform: perspective(600px) rotateX(-1deg) rotateY(2deg);
+  }
+  75% {
+    transform: perspective(600px) rotateX(1deg) rotateY(-1deg);
+  }
+}
+
+/* NEW — Text shimmer gradient sweep */
+@keyframes text-shimmer {
+  0% {
+    background-position: -100% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* NEW — Neon flicker effect */
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    text-shadow:
+      0 0 4px currentColor,
+      0 0 11px currentColor,
+      0 0 19px currentColor,
+      0 0 40px currentColor;
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.8;
+  }
+}
+
+/* NEW — Rainbow border rotation */
+@keyframes rainbow-border {
+  0% { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+
+/* NEW — Bounce subtle (for hover states) */
+@keyframes bounce-subtle {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-8px) scale(1.02); }
+  50% { transform: translateY(-3px); }
+  70% { transform: translateY(-5px) scale(1.01); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* NEW — Pulse ring outward */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Animations helper classes */
 .animate-float {
   animation: float-slow 6s ease-in-out infinite;
 }
@@ -123,4 +324,38 @@ a {
 
 .animate-morph {
   animation: morph-blob 12s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 1s ease-in-out;
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-border-dance {
+  animation: border-dance 4s ease-in-out infinite;
+}
+
+.animate-neon-flicker {
+  animation: neon-flicker 3s infinite;
+}
+
+.animate-text-shimmer {
+  background: linear-gradient(90deg, var(--accent), var(--pink), var(--cyan), var(--accent));
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 4s ease-in-out infinite;
 }
