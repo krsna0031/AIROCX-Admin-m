@@ -46,21 +46,34 @@ function MainWebsite() {
       { id: 8, name: 'Character Sticker Pack', cat: 'Collectibles', price: 9.99, color: '#ec4899', emoji: '✨', image: '' }
     ];
 
+    // If no backend URL configured, skip fetch entirely and use fallback
+    if (!BACKEND_URL) {
+      console.info('No VITE_API_URL configured — using built-in sample data');
+      setCharacters(fallbackCharacters);
+      setShowcaseItems(fallbackShowcase);
+      setMerchItems(fallbackMerch);
+      return;
+    }
+
     try {
       const [charsRes, showcaseRes, merchRes] = await Promise.all([
         fetch(`${BACKEND_URL}/api/characters`),
         fetch(`${BACKEND_URL}/api/showcase`),
         fetch(`${BACKEND_URL}/api/merch`)
       ]);
-      if (charsRes.ok && showcaseRes.ok && merchRes.ok) {
+
+      // Verify all responses are OK AND return JSON (not HTML from a SPA rewrite)
+      const isJSON = (res) => (res.headers.get('content-type') || '').includes('application/json');
+
+      if (charsRes.ok && showcaseRes.ok && merchRes.ok && isJSON(charsRes) && isJSON(showcaseRes) && isJSON(merchRes)) {
         setCharacters(await charsRes.json());
         setShowcaseItems(await showcaseRes.json());
         setMerchItems(await merchRes.json());
       } else {
-        throw new Error('Non-OK response');
+        throw new Error('Non-JSON or non-OK response');
       }
     } catch (error) {
-      console.warn('Backend offline — loading sample data:', error.message);
+      console.warn('Backend unavailable — loading sample data:', error.message);
       setCharacters(fallbackCharacters);
       setShowcaseItems(fallbackShowcase);
       setMerchItems(fallbackMerch);
