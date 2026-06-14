@@ -94,7 +94,7 @@ yarn start
 ### 7. Access the Application
 - **Main Website:** http://localhost:3000/
 - **Admin Dashboard:** http://localhost:3000/admin
-- **Password:** AIROCXIP06
+- **Password:** Set your own `ADMIN_PASSWORD` in `backend/.env`.
 
 ## 📝 Notes:
 
@@ -103,8 +103,9 @@ yarn start
 - MongoDB data NOT included - will seed automatically on first run
 - Full documentation in README.md
 
-## 🔐 Admin Credentials:
-- Password: `AIROCXIP06`
+## Admin credentials
+
+No production password is included. Configure a unique `ADMIN_PASSWORD` with at least 12 characters.
 - See `/memory/test_credentials.md` for API details
 
 ---

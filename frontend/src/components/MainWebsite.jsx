@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+import { apiUrl, readApiError } from '../lib/api.js';
 
 function MainWebsite() {
   const [characters, setCharacters] = useState([]);
@@ -16,8 +15,11 @@ function MainWebsite() {
 
   useEffect(() => {
     fetchData();
-    setupScrollAnimations();
   }, []);
+
+  useEffect(() => {
+    return setupScrollAnimations();
+  }, [characters, showcaseItems, merchItems, showcaseFilter]);
 
   const fetchData = async () => {
     // Fallback sample data if backend is offline
@@ -46,20 +48,11 @@ function MainWebsite() {
       { id: 8, name: 'Character Sticker Pack', cat: 'Collectibles', price: 9.99, color: '#ec4899', emoji: '✨', image: '' }
     ];
 
-    // If no backend URL configured, skip fetch entirely and use fallback
-    if (!BACKEND_URL) {
-      console.info('No VITE_API_URL configured — using built-in sample data');
-      setCharacters(fallbackCharacters);
-      setShowcaseItems(fallbackShowcase);
-      setMerchItems(fallbackMerch);
-      return;
-    }
-
     try {
       const [charsRes, showcaseRes, merchRes] = await Promise.all([
-        fetch(`${BACKEND_URL}/api/characters`),
-        fetch(`${BACKEND_URL}/api/showcase`),
-        fetch(`${BACKEND_URL}/api/merch`)
+        fetch(apiUrl('/api/characters')),
+        fetch(apiUrl('/api/showcase')),
+        fetch(apiUrl('/api/merch'))
       ]);
 
       // Verify all responses are OK AND return JSON (not HTML from a SPA rewrite)
@@ -81,6 +74,10 @@ function MainWebsite() {
   };
 
   const setupScrollAnimations = () => {
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+      return undefined;
+    }
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -89,9 +86,8 @@ function MainWebsite() {
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    setTimeout(() => {
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    }, 200);
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    return () => observer.disconnect();
   };
 
   const addToCart = (name) => {
@@ -105,7 +101,9 @@ function MainWebsite() {
   };
 
   // Character image map for local assets
-  const getCharacterImage = (name) => {
+  const getCharacterImage = (character) => {
+    if (character?.image) return character.image;
+    const name = typeof character === 'string' ? character : character?.name;
     const imageMap = {
       'Blobby': '/images/blobby.png',
       'Ferno': '/images/ferno.png',
@@ -185,7 +183,7 @@ function MainWebsite() {
     }
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/contact`, {
+      const response = await fetch(apiUrl('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -196,17 +194,13 @@ function MainWebsite() {
         showNotification(`✨ Thank you, ${formData.name}! Your inquiry has been sent successfully.`);
         e.target.reset();
       } else {
-        // Fallback: still show success for UX if backend returns non-ok
-        setContactStatus('success');
-        showNotification(`✨ Thank you, ${formData.name}! We received your message.`);
-        e.target.reset();
+        setContactStatus('error');
+        showNotification(await readApiError(response));
       }
     } catch (error) {
       console.error('Contact form error:', error);
-      // Graceful fallback: treat as success for the user
-      setContactStatus('success');
-      showNotification(`✨ Thank you, ${formData.name}! Your message has been received. We'll get back to you soon!`);
-      e.target.reset();
+      setContactStatus('error');
+      showNotification('Could not send your message. Please try again.');
     } finally {
       setContactSubmitting(false);
       setTimeout(() => setContactStatus(''), 5000);
@@ -267,7 +261,7 @@ function MainWebsite() {
             <div className="char-placeholder animate-morph">
               {characters.length > 0 ? (
                 <img 
-                  src={getCharacterImage(characters[0]?.name)} 
+                  src={getCharacterImage(characters[0])}
                   alt={characters[0]?.name}
                   className="hero-char-img animate-float"
                 />
@@ -284,7 +278,7 @@ function MainWebsite() {
             <div className="carousel-track scroll-right">
               {[...Array(6)].map((_, i) => characters.map((ch, idx) => (
                 <div key={`back-${i}-${idx}`} className="carousel-char" style={{ background: getCharacterGradient(ch.name) }}>
-                  <img src={getCharacterImage(ch.name)} alt={ch.name} className="carousel-char-img" />
+                  <img src={getCharacterImage(ch)} alt={ch.name} className="carousel-char-img" />
                   <span className="char-label">{ch.name}</span>
                 </div>
               )))}
@@ -294,7 +288,7 @@ function MainWebsite() {
             <div className="carousel-track scroll-left">
               {[...Array(6)].map((_, i) => characters.map((ch, idx) => (
                 <div key={`mid-${i}-${idx}`} className="carousel-char" style={{ background: getCharacterGradient(ch.name) }}>
-                  <img src={getCharacterImage(ch.name)} alt={ch.name} className="carousel-char-img" />
+                  <img src={getCharacterImage(ch)} alt={ch.name} className="carousel-char-img" />
                   <span className="char-label">{ch.name}</span>
                 </div>
               )))}
@@ -304,7 +298,7 @@ function MainWebsite() {
             <div className="carousel-track scroll-right">
               {[...Array(6)].map((_, i) => characters.map((ch, idx) => (
                 <div key={`front-${i}-${idx}`} className="carousel-char" style={{ background: getCharacterGradient(ch.name) }}>
-                  <img src={getCharacterImage(ch.name)} alt={ch.name} className="carousel-char-img" />
+                  <img src={getCharacterImage(ch)} alt={ch.name} className="carousel-char-img" />
                   <span className="char-label">{ch.name}</span>
                 </div>
               )))}
@@ -339,7 +333,7 @@ function MainWebsite() {
                  onClick={() => setSelectedChar(char)}>
               <div className="char-img">
                 <div className="char-img-inner" style={{ background: getCharacterGradient(char.name) }}>
-                  <img src={getCharacterImage(char.name)} alt={char.name} className="char-photo" />
+                  <img src={getCharacterImage(char)} alt={char.name} className="char-photo" />
                 </div>
               </div>
               <div className="char-info">
@@ -363,7 +357,7 @@ function MainWebsite() {
             <button className="modal-close" onClick={() => setSelectedChar(null)}>✕</button>
             <div className="char-modal-content">
               <div className="char-modal-img" style={{ background: getCharacterGradient(selectedChar.name) }}>
-                <img src={getCharacterImage(selectedChar.name)} alt={selectedChar.name} className="modal-char-photo" />
+                <img src={getCharacterImage(selectedChar)} alt={selectedChar.name} className="modal-char-photo" />
               </div>
               <div className="char-modal-info">
                 <h2>{selectedChar.name}</h2>
@@ -409,7 +403,7 @@ function MainWebsite() {
                 onClick={() => setActiveDescChar(idx)}
                 style={{ '--tab-color': getCharacterGradient(char.name) }}
               >
-                <img src={getCharacterImage(char.name)} alt={char.name} className="spotlight-tab-img" />
+                <img src={getCharacterImage(char)} alt={char.name} className="spotlight-tab-img" />
                 <span>{char.name}</span>
               </button>
             ))}
@@ -418,12 +412,20 @@ function MainWebsite() {
           {/* Active character spotlight */}
           {(() => {
             const char = characters[activeDescChar];
-            const lore = characterLore[char?.name] || {};
+            const fallbackLore = characterLore[char?.name] || {};
+            const lore = {
+              origin: char?.origin || fallbackLore.origin,
+              quote: char?.quote || fallbackLore.quote,
+              element: char?.element || fallbackLore.element,
+              abilities: char?.abilities
+                ? char.abilities.split(',').map((ability) => ability.trim()).filter(Boolean)
+                : fallbackLore.abilities
+            };
             return char ? (
               <div className="spotlight-content reveal visible" key={char.name}>
                 <div className="spotlight-image-side">
                   <div className="spotlight-img-wrap" style={{ background: getCharacterGradient(char.name) }}>
-                    <img src={getCharacterImage(char.name)} alt={char.name} className="spotlight-hero-img" />
+                    <img src={getCharacterImage(char)} alt={char.name} className="spotlight-hero-img" />
                   </div>
                   <div className="spotlight-element-badge">
                     <span className="element-icon">{getCharacterEmoji(char.name)}</span>
@@ -548,6 +550,9 @@ function MainWebsite() {
           <div className="section-header">
             <div className="section-eyebrow">E-Commerce</div>
             <h2 className="section-title">Official Store</h2>
+            <p className="section-desc merch-intro">
+              Bring the AIROCX universe home with character collectibles, apparel, art, and creative play kits made for fans of every age.
+            </p>
           </div>
           <a href="#merch" onClick={() => showNotification("📦 Expanding store catalogs. Full checkout portal coming soon!")} className="view-all-link">Browse Full Store ➔</a>
         </div>
@@ -572,6 +577,9 @@ function MainWebsite() {
               <div className="merch-details">
                 <div className="merch-cat">{item.cat}</div>
                 <div className="merch-name">{item.name}</div>
+                <p className="merch-description">
+                  {item.description || `Official ${item.name} inspired by the AIROCX story universe.`}
+                </p>
                 <div className="merch-price-row">
                   <span className="merch-price">${item.price.toFixed(2)}</span>
                   <button className="merch-btn" onClick={() => addToCart(item.name)}>

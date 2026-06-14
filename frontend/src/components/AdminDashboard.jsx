@@ -4,20 +4,26 @@ import { Users, Tv, ShoppingBag, LogOut, Globe } from 'lucide-react';
 import CharactersTab from './CharactersTab.jsx';
 import ShowcaseTab from './ShowcaseTab.jsx';
 import MerchTab from './MerchTab.jsx';
+import { authFetch, clearAdminToken, getAdminToken } from '../lib/api.js';
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('characters');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
+    const token = getAdminToken();
     if (!token) {
       navigate('/admin');
+      return;
     }
+    authFetch('/api/auth/verify').catch(() => {
+      clearAdminToken();
+      navigate('/admin');
+    });
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+    clearAdminToken();
     navigate('/admin');
   };
 

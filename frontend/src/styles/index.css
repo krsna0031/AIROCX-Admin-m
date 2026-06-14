@@ -1077,6 +1077,10 @@ section {
   margin-bottom: 0;
   text-align: left;
 }
+.merch-intro {
+  margin-top: 16px;
+  max-width: 680px;
+}
 .view-all-link {
   font-size: 13px;
   font-weight: 600;
@@ -1142,6 +1146,13 @@ section {
   font-family: var(--font-body);
   font-size: 16px;
   font-weight: 700;
+  margin-bottom: 8px;
+}
+.merch-description {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 58px;
   margin-bottom: 16px;
 }
 .merch-price-row {
@@ -1763,6 +1774,29 @@ footer::before {
 .btn-small-outline:hover {
   background: #fff;
   color: var(--text-dark);
+}
+.btn-small-outline.danger {
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.3);
+}
+.image-field-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+.image-field-help {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.image-error {
+  margin: 8px 0 0;
+}
+.media-placeholder {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* ADMIN PANEL FORMS & CARDS GRID */

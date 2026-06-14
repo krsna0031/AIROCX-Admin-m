@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+import ImageField from './ImageField.jsx';
+import { apiUrl, authFetch, readApiError } from '../lib/api.js';
 
 function ShowcaseTab() {
   const [showcase, setShowcase] = useState([]);
@@ -13,7 +13,7 @@ function ShowcaseTab() {
 
   const fetchShowcase = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/showcase`);
+      const response = await fetch(apiUrl('/api/showcase'));
       if (response.ok) {
         setShowcase(await response.json());
       }
@@ -33,13 +33,11 @@ function ShowcaseTab() {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/showcase/${editing}`, {
+      const response = await authFetch(`/api/showcase/${editing}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
@@ -49,7 +47,7 @@ function ShowcaseTab() {
         setEditing(null);
         alert('✨ Showcase asset updated!');
       } else {
-        alert('❌ Error updating. Check token credentials.');
+        alert(await readApiError(response));
       }
     } catch (error) {
       console.error('Error saving asset:', error);
@@ -59,12 +57,8 @@ function ShowcaseTab() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this showcase asset?')) return;
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/showcase/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await authFetch(`/api/showcase/${id}`, { method: 'DELETE' });
       if (response.ok) {
         fetchShowcase();
         alert('🗑️ Showcase asset removed!');
@@ -86,13 +80,11 @@ function ShowcaseTab() {
       large: false
     };
 
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/showcase`, {
+      const response = await authFetch('/api/showcase', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(newItem)
       });
@@ -155,11 +147,13 @@ function ShowcaseTab() {
                 <label className="form-label">YouTube Video ID (e.g. dQw4w9WgXcQ)</label>
                 <input name="ytId" className="form-input" value={formData.ytId || ''} onChange={handleChange} placeholder="Only for Video type" />
               </div>
-              <div className="form-group">
-                <label className="form-label">Design Image URL (Optional)</label>
-                <input name="image" className="form-input" value={formData.image || ''} onChange={handleChange} />
-              </div>
             </div>
+
+            <ImageField
+              value={formData.image || ''}
+              onChange={(image) => setFormData({ ...formData, image })}
+              label="Showcase Image"
+            />
 
             <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '20px 0' }}>
               <input type="checkbox" name="large" id="checkLarge" checked={formData.large || false} onChange={handleChange} style={{ cursor: 'pointer', width: '18px', height: '18px' }} />

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+import { apiUrl, readApiError } from '../lib/api.js';
 
 function AdminLogin() {
   const [password, setPassword] = useState('');
@@ -15,7 +14,7 @@ function AdminLogin() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+      const response = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
@@ -23,13 +22,13 @@ function AdminLogin() {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('adminToken', data.token);
+        sessionStorage.setItem('adminToken', data.token);
         navigate('/admin/dashboard');
       } else {
-        setError('❌ Invalid credentials. Please try again.');
+        setError(await readApiError(response));
       }
     } catch (err) {
-      setError('⚠️ Could not connect to API server.');
+      setError('Could not connect to the API server.');
     } finally {
       setLoading(false);
     }

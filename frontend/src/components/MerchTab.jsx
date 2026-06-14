@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+import ImageField from './ImageField.jsx';
+import { apiUrl, authFetch, readApiError } from '../lib/api.js';
 
 function MerchTab() {
   const [merch, setMerch] = useState([]);
@@ -13,7 +13,7 @@ function MerchTab() {
 
   const fetchMerch = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/merch`);
+      const response = await fetch(apiUrl('/api/merch'));
       if (response.ok) {
         setMerch(await response.json());
       }
@@ -33,13 +33,11 @@ function MerchTab() {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/merch/${editing}`, {
+      const response = await authFetch(`/api/merch/${editing}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
@@ -49,7 +47,7 @@ function MerchTab() {
         setEditing(null);
         alert('✨ Merchandise updated successfully!');
       } else {
-        alert('❌ Update failed. Verify authentication.');
+        alert(await readApiError(response));
       }
     } catch (error) {
       console.error('Error saving item:', error);
@@ -59,12 +57,8 @@ function MerchTab() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product from catalog?')) return;
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/merch/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await authFetch(`/api/merch/${id}`, { method: 'DELETE' });
       if (response.ok) {
         fetchMerch();
         alert('🗑️ Product deleted!');
@@ -81,16 +75,15 @@ function MerchTab() {
       price: 19.99,
       color: '#ef4444',
       emoji: '🧸',
-      image: ''
+      image: '',
+      description: 'A new collectible inspired by the AIROCX character universe.'
     };
 
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/merch`, {
+      const response = await authFetch('/api/merch', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(newItem)
       });
@@ -141,11 +134,18 @@ function MerchTab() {
                 <label className="form-label">Emoji Representation (If no Image URL)</label>
                 <input name="emoji" className="form-input" value={formData.emoji || ''} onChange={handleChange} placeholder="e.g. 👕, 🧸, 📌" />
               </div>
-              <div className="form-group">
-                <label className="form-label">Image URL (Optional)</label>
-                <input name="image" className="form-input" value={formData.image || ''} onChange={handleChange} />
-              </div>
             </div>
+
+            <div className="form-group">
+              <label className="form-label">Product Description</label>
+              <textarea name="description" className="form-input" value={formData.description || ''} onChange={handleChange} rows={3} />
+            </div>
+
+            <ImageField
+              value={formData.image || ''}
+              onChange={(image) => setFormData({ ...formData, image })}
+              label="Product Image"
+            />
 
             <div className="form-actions">
               <button onClick={handleSave} className="btn-primary" style={{ flex: 1 }}>Save Changes</button>
@@ -166,6 +166,7 @@ function MerchTab() {
               </div>
               <h3>{item.name}</h3>
               <p className="role">{item.cat}</p>
+              <p className="desc-small">{item.description}</p>
               <h4 style={{ fontSize: '20px', fontFamily: 'Space Grotesk, sans-serif', color: '#fff', marginBottom: '16px' }}>
                 ${(item.price || 0).toFixed(2)}
               </h4>

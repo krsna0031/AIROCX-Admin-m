@@ -16,7 +16,8 @@ def merch_to_dict(item: models.MerchItem):
         "price": item.price,
         "color": item.color,
         "emoji": item.emoji,
-        "image": item.image or ""
+        "image": item.image or "",
+        "description": item.description or "",
     }
 
 @router.get("", response_model=List[schemas.MerchItemResponse])
@@ -26,7 +27,7 @@ def get_merch(db: Session = Depends(get_db)):
 
 @router.post("", response_model=schemas.MerchItemResponse)
 def create_merch_item(item: schemas.MerchItemCreate, db: Session = Depends(get_db), auth=Depends(verify_token)):
-    db_item = models.MerchItem(**item.dict())
+    db_item = models.MerchItem(**item.model_dump())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -38,7 +39,7 @@ def update_merch_item(item_id: int, item: schemas.MerchItemCreate, db: Session =
     if not db_item:
         raise HTTPException(status_code=404, detail="Merch item not found")
     
-    for key, value in item.dict().items():
+    for key, value in item.model_dump().items():
         setattr(db_item, key, value)
     
     db.commit()

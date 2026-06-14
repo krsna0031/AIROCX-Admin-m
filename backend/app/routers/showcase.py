@@ -28,7 +28,7 @@ def get_showcase(db: Session = Depends(get_db)):
 
 @router.post("", response_model=schemas.ShowcaseItemResponse)
 def create_showcase_item(item: schemas.ShowcaseItemCreate, db: Session = Depends(get_db), auth=Depends(verify_token)):
-    db_item = models.ShowcaseItem(**item.dict())
+    db_item = models.ShowcaseItem(**item.model_dump())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -40,7 +40,7 @@ def update_showcase_item(item_id: int, item: schemas.ShowcaseItemCreate, db: Ses
     if not db_item:
         raise HTTPException(status_code=404, detail="Showcase item not found")
     
-    for key, value in item.dict().items():
+    for key, value in item.model_dump().items():
         setattr(db_item, key, value)
     
     db.commit()

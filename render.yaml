@@ -1,7 +1,4 @@
 services:
-  # ═══════════════════════════════════════════════
-  # 1. Python FastAPI Backend (Render Web Service)
-  # ═══════════════════════════════════════════════
   - type: web
     name: airocx-api
     runtime: python
@@ -11,13 +8,25 @@ services:
     plan: free
     envVars:
       - key: DATABASE_URL
-        value: "sqlite:///./airocx.db"
+        fromDatabase:
+          name: airocx-db
+          property: connectionString
       - key: JWT_SECRET
         generateValue: true
       - key: ADMIN_PASSWORD
-        value: "AIROCXIP06"
-      - key: FRONTEND_URL
-        value: "https://your-app.vercel.app"
+        sync: false
+      - key: FRONTEND_URLS
+        sync: false
+      - key: ALLOWED_HOSTS
+        value: "*.onrender.com,localhost,127.0.0.1"
+      - key: ENVIRONMENT
+        value: "production"
       - key: PYTHON_VERSION
-        value: "3.12.0"
+        value: "3.12.8"
     healthCheckPath: /api/health
+
+databases:
+  - name: airocx-db
+    plan: free
+    databaseName: airocx
+    user: airocx

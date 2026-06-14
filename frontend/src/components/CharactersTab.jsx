@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+import ImageField from './ImageField.jsx';
+import { apiUrl, authFetch, readApiError } from '../lib/api.js';
 
 function CharactersTab() {
   const [characters, setCharacters] = useState([]);
@@ -13,7 +13,7 @@ function CharactersTab() {
 
   const fetchCharacters = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/characters`);
+      const response = await fetch(apiUrl('/api/characters'));
       if (response.ok) {
         const data = await response.json();
         setCharacters(data);
@@ -24,8 +24,8 @@ function CharactersTab() {
   };
 
   const handleEdit = (char) => {
-    setEditing(char._id);
-    setFormData(char);
+    setEditing(char._id || char.id);
+    setFormData({ ...char });
   };
 
   const handleChange = (e) => {
@@ -33,13 +33,11 @@ function CharactersTab() {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/characters/${editing}`, {
+      const response = await authFetch(`/api/characters/${editing}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
@@ -49,7 +47,7 @@ function CharactersTab() {
         setEditing(null);
         alert('✨ Character successfully updated!');
       } else {
-        alert('❌ Error updating character. Verify authentication.');
+        alert(await readApiError(response));
       }
     } catch (error) {
       console.error('Error saving character:', error);
@@ -60,12 +58,8 @@ function CharactersTab() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this character?')) return;
     
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/characters/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await authFetch(`/api/characters/${id}`, { method: 'DELETE' });
       if (response.ok) {
         fetchCharacters();
         alert('🗑️ Character deleted!');
@@ -85,17 +79,19 @@ function CharactersTab() {
       fans: '10K',
       power: 'Quantum Jump',
       color: 'linear-gradient(135deg, #00cec9, #0984e3)',
-      svg: '<svg width="70" height="85" viewBox="0 0 220 260"><circle cx="110" cy="130" r="70" fill="#00cec9"/><circle cx="85" cy="110" r="14" fill="white"/><circle cx="135" cy="110" r="14" fill="white"/><circle cx="88" cy="108" r="6" fill="#1a1a2e"/><circle cx="138" cy="108" r="6" fill="#1a1a2e"/><ellipse cx="110" cy="155" rx="12" ry="6" fill="#1a1a2e"/></svg>',
-      image: ''
+      svg: '',
+      image: '',
+      origin: 'A newly discovered corner of the AIROCX universe',
+      quote: 'Every adventure starts with one brave step.',
+      element: 'Aether',
+      abilities: 'Quantum Jump, Star Compass'
     };
 
-    const token = localStorage.getItem('adminToken');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/characters`, {
+      const response = await authFetch('/api/characters', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(newChar)
       });
@@ -143,6 +139,27 @@ function CharactersTab() {
 
             <div className="form-row">
               <div className="form-group">
+                <label className="form-label">Origin</label>
+                <input name="origin" className="form-input" value={formData.origin || ''} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Element</label>
+                <input name="element" className="form-input" value={formData.element || ''} onChange={handleChange} />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Signature Quote</label>
+              <input name="quote" className="form-input" value={formData.quote || ''} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Abilities (comma separated)</label>
+              <input name="abilities" className="form-input" value={formData.abilities || ''} onChange={handleChange} />
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
                 <label className="form-label">Episodes</label>
                 <input name="episodes" className="form-input" value={formData.episodes || ''} onChange={handleChange} />
               </div>
@@ -161,16 +178,11 @@ function CharactersTab() {
               <input name="color" className="form-input" value={formData.color || ''} onChange={handleChange} />
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Image URL (Optional - overrides SVG)</label>
-              <input name="image" className="form-input" value={formData.image || ''} onChange={handleChange} />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">SVG Vector Markup (If Image URL is blank)</label>
-              <textarea name="svg" className="form-input" value={formData.svg || ''} onChange={handleChange} rows={5} 
-                        style={{ fontFamily: 'monospace', fontSize: '11px', lineHeight: '1.4' }} />
-            </div>
+            <ImageField
+              value={formData.image || ''}
+              onChange={(image) => setFormData({ ...formData, image })}
+              label="Character Image"
+            />
 
             <div className="form-actions">
               <button onClick={handleSave} className="btn-primary" style={{ flex: 1 }}>Save Changes</button>
@@ -186,7 +198,7 @@ function CharactersTab() {
                 {formData.image ? (
                   <img src={formData.image} alt={formData.name} className="char-photo" />
                 ) : (
-                  <div dangerouslySetInnerHTML={{ __html: formData.svg || '<svg></svg>' }} />
+                  <div className="media-placeholder">Add an image</div>
                 )}
               </div>
               <h3 style={{ fontFamily: 'Syne, sans-serif' }}>{formData.name || 'New Hero'}</h3>
@@ -208,7 +220,7 @@ function CharactersTab() {
                 {char.image ? (
                   <img src={char.image} alt={char.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                  <div dangerouslySetInnerHTML={{ __html: char.svg }} />
+                  <div className="media-placeholder">No image</div>
                 )}
               </div>
               <h3>{char.name}</h3>

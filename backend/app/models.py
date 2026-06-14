@@ -13,8 +13,12 @@ class Character(Base):
     fans = Column(String(50), nullable=False)
     power = Column(String(100), nullable=False)
     color = Column(String(200), nullable=False)
-    svg = Column(Text, nullable=False)
-    image = Column(String(500), default="", nullable=True)
+    svg = Column(Text, default="", nullable=False)
+    image = Column(Text, default="", nullable=True)
+    origin = Column(String(300), default="", nullable=False)
+    quote = Column(String(500), default="", nullable=False)
+    element = Column(String(100), default="", nullable=False)
+    abilities = Column(Text, default="", nullable=False)
 
 
 class ShowcaseItem(Base):
@@ -27,7 +31,7 @@ class ShowcaseItem(Base):
     desc = Column(String(500), nullable=False)
     ytId = Column(String(100), default="", nullable=True)
     color = Column(String(100), nullable=False)
-    image = Column(String(500), default="", nullable=True)
+    image = Column(Text, default="", nullable=True)
     large = Column(Boolean, default=False, nullable=False)
 
 
@@ -40,7 +44,8 @@ class MerchItem(Base):
     price = Column(Float, nullable=False)
     color = Column(String(100), nullable=False)
     emoji = Column(String(50), nullable=False)
-    image = Column(String(500), default="", nullable=True)
+    image = Column(Text, default="", nullable=True)
+    description = Column(String(500), default="", nullable=False)
 
 
 class ContactMessage(Base):

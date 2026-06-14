@@ -1,15 +1,20 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 from app.config import settings
 
+database_url = settings.DATABASE_URL
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
 # SQLite requires different arguments for multi-threading in FastAPI
-is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+is_sqlite = database_url.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 
 engine = create_engine(
-    settings.DATABASE_URL, 
-    connect_args=connect_args
+    database_url,
+    connect_args=connect_args,
+    pool_pre_ping=True,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

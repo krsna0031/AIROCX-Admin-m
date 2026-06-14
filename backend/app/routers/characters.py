@@ -20,7 +20,11 @@ def char_to_dict(char: models.Character):
         "power": char.power,
         "color": char.color,
         "svg": char.svg,
-        "image": char.image or ""
+        "image": char.image or "",
+        "origin": char.origin or "",
+        "quote": char.quote or "",
+        "element": char.element or "",
+        "abilities": char.abilities or "",
     }
 
 @router.get("", response_model=List[schemas.CharacterResponse])
@@ -30,7 +34,7 @@ def get_characters(db: Session = Depends(get_db)):
 
 @router.post("", response_model=schemas.CharacterResponse)
 def create_character(char: schemas.CharacterCreate, db: Session = Depends(get_db), auth=Depends(verify_token)):
-    db_char = models.Character(**char.dict())
+    db_char = models.Character(**char.model_dump())
     db.add(db_char)
     db.commit()
     db.refresh(db_char)
@@ -42,7 +46,7 @@ def update_character(char_id: int, char: schemas.CharacterCreate, db: Session = 
     if not db_char:
         raise HTTPException(status_code=404, detail="Character not found")
     
-    for key, value in char.dict().items():
+    for key, value in char.model_dump().items():
         setattr(db_char, key, value)
     
     db.commit()
